@@ -1,10 +1,17 @@
 #!/bin/bash
 
 function aarg_activate() {
+    local DEBUG=false # Set to true for verbose debugging output
     local venv_root_path="$HOME/venvs" # Ensure this path is correctly set
 
-    # Debugging: Print the root path and check if it exists
-    echo "Checking root path: $venv_root_path"
+    # Debugging function
+    function debug_print() {
+        if [ "$DEBUG" = true ]; then
+            echo "[DEBUG] $1"
+        fi
+    }
+
+    debug_print "Checking root path: $venv_root_path"
     if [ ! -d "$venv_root_path" ]; then
         echo "The specified root path for virtual environments does not exist or is not a directory: $venv_root_path"
         return 1
@@ -14,13 +21,13 @@ function aarg_activate() {
     local venvs=()
     local i=1
 
-    # Debugging: Check contents of venv_root_path
-    echo "Contents of $venv_root_path:"
-    ls -la "$venv_root_path"
+    debug_print "Contents of $venv_root_path:"
+    debug_print "$(ls -la "$venv_root_path")"
 
-    # Use a loop to iterate over directories
-    for venv in "$venv_root_path"/*; do
-        if [ -d "$venv" ]; then
+    # Use a loop to iterate over directories, including hidden ones
+    for venv in "$venv_root_path"/{*,.*}; do
+        debug_print "Checking: $venv"
+        if [ -d "$venv" ] && [ ! "$(basename "$venv")" = "." ] && [ ! "$(basename "$venv")" = ".." ]; then
             venvs[i]="$(basename "$venv")"
             echo "$i) ${venvs[i]}"
             i=$((i + 1))
@@ -41,6 +48,7 @@ function aarg_activate() {
     fi
 
     local activate_script="${venv_root_path}/${venvs[selection]}/bin/activate"
+    debug_print "Activation script path: $activate_script"
     if [ -f "$activate_script" ]; then
         echo "Activating virtual environment: ${venvs[selection]}"
         # shellcheck disable=SC1090
