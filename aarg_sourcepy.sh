@@ -3,7 +3,8 @@
 function aarg_activate() {
     local venv_root_path="$HOME/venvs" # Ensure this path is correctly set
 
-    # Check if venv_root_path exists and is a directory
+    # Debugging: Print the root path and check if it exists
+    echo "Checking root path: $venv_root_path"
     if [ ! -d "$venv_root_path" ]; then
         echo "The specified root path for virtual environments does not exist or is not a directory: $venv_root_path"
         return 1
@@ -12,6 +13,10 @@ function aarg_activate() {
     echo "Available virtual environments:"
     local venvs=()
     local i=1
+
+    # Debugging: Check contents of venv_root_path
+    echo "Contents of $venv_root_path:"
+    ls -la "$venv_root_path"
 
     # Use a loop to iterate over directories
     for venv in "$venv_root_path"/*; do
